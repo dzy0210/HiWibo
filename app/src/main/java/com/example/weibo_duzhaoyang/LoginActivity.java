@@ -153,7 +153,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
     }
     void getUserinfo() {
-        String token = sharedPreferences.getString("token", "");
+        String token = sharedPreferences.getString("token", "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MTc3MDYzODYsInN1YiI6IjE3MzU2NTI4MDY3IiwiY3JlYXRlZCI6MTcxNzY2MzE4Njc2M30.c7Oue3X3i3QRGZPbXuZZWaYW6A6AHwNPwOX0ym6zGnlQYINJOnbOuf6wwCNxMFyYP53l9Ef3Aa1piohKVEwrnQ");
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Call<BaseBean<UserInfo>> userInfo = RetrofitManager.getInstance(token).createApi().getUserInfo();
         userInfo.enqueue(new Callback<BaseBean<UserInfo>>() {
