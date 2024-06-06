@@ -31,12 +31,12 @@ public class MineFragment extends Fragment {
     TextView tvFansNum;
     MaterialToolbar toolbar;
     boolean logged;
+    SharedPreferences sharedPreferences;
+    TextView back;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("dzy", Context.MODE_PRIVATE);
-        logged = sharedPreferences.getBoolean("logged", false);
-
+        sharedPreferences = getContext().getSharedPreferences("dzy", Context.MODE_PRIVATE);
     }
 
     @Override
@@ -44,8 +44,9 @@ public class MineFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_mine, container, false);
-        initToolbar(view);
         initView(view);
+        initToolbar(view);
+
         return view;
     }
     void initView(View view) {
@@ -55,20 +56,7 @@ public class MineFragment extends Fragment {
         ivAvtar.setOnClickListener(this::login);
         tvUsername.setOnClickListener(this::login);
         tvFansNum.setOnClickListener(this::login);
-        if (!logged) {
-            Glide.with(ivAvtar).load(R.drawable.null_avatar).apply(new RequestOptions().placeholder(R.drawable.null_avatar).circleCrop()).into(ivAvtar);
-            tvUsername.setText("请先登录");
-            tvFansNum.setText("点击头像去登陆");
-        } else {
-            ivAvtar.setEnabled(false);
-            tvUsername.setEnabled(false);
-            tvFansNum.setEnabled(false);
-            SharedPreferences sharedPreferences = getContext().getSharedPreferences("dzy", Context.MODE_PRIVATE);
-            tvUsername.setText(sharedPreferences.getString("username", ""));
-            Glide.with(ivAvtar).load(sharedPreferences.getString("avatar", "")).apply(new RequestOptions().placeholder(R.drawable.null_avatar).circleCrop()).into(ivAvtar);
-            tvFansNum.setText("粉丝数：9999");
-            tvUsername.setText("大王叫我来巡山");
-        }
+        loadData();
     }
 
     private void login(View view) {
@@ -79,7 +67,7 @@ public class MineFragment extends Fragment {
         toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle("我的");
         if (logged) {
-            TextView back = toolbar.findViewById(R.id.toolbar_operation);
+            back = toolbar.findViewById(R.id.toolbar_operation);
             back.setText("退出");
             back.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -91,6 +79,32 @@ public class MineFragment extends Fragment {
                     startActivity(new Intent(getContext(), LoginActivity.class));
                 }
             });
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadData();
+
+    }
+    void loadData() {
+        logged = sharedPreferences.getBoolean("logged", false);
+        if (!logged) {
+            Glide.with(ivAvtar).load(R.drawable.null_avatar).apply(new RequestOptions().placeholder(R.drawable.null_avatar).circleCrop()).into(ivAvtar);
+            tvUsername.setText("请先登录");
+            tvFansNum.setText("点击头像去登陆");
+//            back.setVisibility(View.INVISIBLE);
+
+        } else {
+            ivAvtar.setEnabled(false);
+            tvUsername.setEnabled(false);
+            tvFansNum.setEnabled(false);
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("dzy", Context.MODE_PRIVATE);
+            tvUsername.setText(sharedPreferences.getString("username", ""));
+            Glide.with(ivAvtar).load(sharedPreferences.getString("avatar", "")).apply(new RequestOptions().placeholder(R.drawable.null_avatar).circleCrop()).into(ivAvtar);
+            tvFansNum.setText("粉丝数：9999");
+            tvUsername.setText("大王叫我来巡山");
         }
     }
 }

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -167,6 +168,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     editor.putBoolean("logged", true);
                     editor.apply();
                     finish();
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 }
             }
 
