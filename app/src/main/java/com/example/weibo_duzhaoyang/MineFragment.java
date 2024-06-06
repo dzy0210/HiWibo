@@ -104,7 +104,7 @@ public class MineFragment extends Fragment {
             tvUsername.setText(sharedPreferences.getString("username", ""));
             Glide.with(ivAvtar).load(sharedPreferences.getString("avatar", "")).apply(new RequestOptions().placeholder(R.drawable.null_avatar).circleCrop()).into(ivAvtar);
             tvFansNum.setText("粉丝数：9999");
-            tvUsername.setText("大王叫我来巡山");
+            tvUsername.setText(sharedPreferences.getString("username", ""));
         }
     }
 }
