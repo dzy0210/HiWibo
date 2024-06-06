@@ -2,11 +2,14 @@ package com.example.weibo_duzhaoyang;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -41,9 +44,12 @@ public class MainActivity extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(this, fragments);
         vp.setAdapter(adapter);
         new TabLayoutMediator(tab, vp, (tab, position) -> {
-            tab.setText(titles[position]);
-            tab.setIcon(icons[position]);
-        }).attach();
 
+            tab.setText(titles[position]);
+            tab.setIcon(ContextCompat.getDrawable(this, icons[position]));
+        }).attach();
+        for (int i = 0; i < tab.getTabCount(); i++) {
+            tab.getTabAt(i).setIcon(icons[i]);
+        }
     }
 }

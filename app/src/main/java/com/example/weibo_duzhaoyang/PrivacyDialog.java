@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.example.weibo_duzhaoyang.utils.SharedPreferencesUtil;
+
 public class PrivacyDialog extends Dialog implements View.OnClickListener {
     Context context;
     String title;
@@ -29,6 +31,7 @@ public class PrivacyDialog extends Dialog implements View.OnClickListener {
     private TextView tvDisagree;
     private DialogClickListener dialogClickListener;
 
+    SharedPreferencesUtil spu = MyApplication.getSp();
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -48,10 +51,8 @@ public class PrivacyDialog extends Dialog implements View.OnClickListener {
     }
 
     private void agree() {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("dzy", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("privacy_policy", true);
-        editor.apply();
+
+        spu.putData("privacy_policy", true);
         dismiss();
     }
 

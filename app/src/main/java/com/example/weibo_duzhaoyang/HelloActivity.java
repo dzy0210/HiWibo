@@ -15,15 +15,15 @@ import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.weibo_duzhaoyang.utils.SharedPreferencesUtil;
+
 public class HelloActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hello);
-
-        SharedPreferences sharedPreferences = getSharedPreferences("dzy", MODE_PRIVATE);
-        boolean privacyPolicy = sharedPreferences.getBoolean("privacy_policy", false);
+        boolean privacyPolicy = (Boolean) MyApplication.getSp().getData("privacy_policy", false);
         if (!privacyPolicy) {
             showPrivacyDialog(this);
         } else {
@@ -64,10 +64,7 @@ public class HelloActivity extends AppCompatActivity {
             @Override
             public void onPositiveButtonClick() {
                 privacyDialog.dismiss();
-                SharedPreferences sharedPreferences = getSharedPreferences("dzy", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("privacy_policy", true);
-                editor.apply();
+                MyApplication.getSp().putData("privacy_policy", true);
 
                 startActivity(new Intent(HelloActivity.this, MainActivity.class));
                 finish();

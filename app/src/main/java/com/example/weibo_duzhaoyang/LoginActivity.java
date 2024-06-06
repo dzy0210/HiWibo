@@ -20,6 +20,7 @@ import com.example.weibo_duzhaoyang.bean.BaseBean;
 import com.example.weibo_duzhaoyang.bean.LoginBean;
 import com.example.weibo_duzhaoyang.bean.UserInfo;
 import com.example.weibo_duzhaoyang.retrofit.RetrofitManager;
+import com.example.weibo_duzhaoyang.utils.SharedPreferencesUtil;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import retrofit2.Call;
@@ -33,11 +34,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     EditText etPhone;
     EditText etSms;
     TextView tvLogin;
-    SharedPreferences sharedPreferences;
-
-
     final int totalSecondCount = 60;
     int currentSecond = totalSecondCount;
+    SharedPreferencesUtil spu = MyApplication.getSp();
 
     private final Handler handler = new Handler() {
         @Override
@@ -67,7 +66,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        sharedPreferences = getSharedPreferences("dzy", MODE_PRIVATE);
         initView();
         initToolbar();
     }
@@ -81,7 +79,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         tvLogin.setText("立即登录");
         tvGetSms.setOnClickListener(this);
         tvLogin.setOnClickListener(this);
-        String phone = sharedPreferences.getString("phone", "");
+        String phone = (String) spu.getData("phone", "");
         if (!phone.equals("")) {
             etPhone.setText(phone);
         }
@@ -94,7 +92,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.tv_get_sms: {
                 tvGetSms.setEnabled(false);
                 countDown();
-                getSms();
+//                getSms();
                 break;
             }
             case R.id.tv_login:{
@@ -131,15 +129,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         call.enqueue(new Callback<BaseBean<String>>() {
             @Override
             public void onResponse(Call<BaseBean<String>> call, Response<BaseBean<String>> response) {
-                Log.i(TAG, "onResponse1: "+response.body());
                 Log.i(TAG, "onResponse1: "+response.body().getData());
                 if (response.body().getCode() == 200) {
                     Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
                     String token = response.body().getData();
-                    editor.putString("token", token);
-                    editor.putString("phone", phone);
-                    editor.apply();
+                    spu.putData("token", token);
+                    spu.putData("phone", phone);
+                    Log.i(TAG, "onResponse:2 "+token);
+//                    getUserinfo();
                 } else {
                     Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
                 }
@@ -153,20 +150,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
     }
     void getUserinfo() {
-        String token = sharedPreferences.getString("token", "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MTc3MDYzODYsInN1YiI6IjE3MzU2NTI4MDY3IiwiY3JlYXRlZCI6MTcxNzY2MzE4Njc2M30.c7Oue3X3i3QRGZPbXuZZWaYW6A6AHwNPwOX0ym6zGnlQYINJOnbOuf6wwCNxMFyYP53l9Ef3Aa1piohKVEwrnQ");
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        String token = (String) MyApplication.getSp().getData("token", "");
+        Log.i(TAG, "getUserinfo:3 "+token);
         Call<BaseBean<UserInfo>> userInfo = RetrofitManager.getInstance(token).createApi().getUserInfo();
         userInfo.enqueue(new Callback<BaseBean<UserInfo>>() {
             @Override
             public void onResponse(Call<BaseBean<UserInfo>> call, Response<BaseBean<UserInfo>> response) {
                 if(response.body().getCode() == 200) {
-                    Log.i(TAG, "onResponse: "+response.body().getData());
+                    Log.i(TAG, "onResponse:4 "+response.body().getData());
                     UserInfo data = response.body().getData();
-                    editor.putString("username", data.getUsername());
-                    editor.putString("avatar", data.getAvatar());
-                    editor.putLong("id", data.getId());
-                    editor.putBoolean("logged", true);
-                    editor.apply();
+                    spu.putData("username", data.getUsername());
+                    spu.putData("avatar", data.getAvatar());
+                    spu.putData("id", data.getId());
+                    spu.putData("logged", true);
                     finish();
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 }
@@ -188,9 +184,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 public void onResponse(Call<BaseBean<Boolean>> call, Response<BaseBean<Boolean>> response) {
 
                     Toast.makeText(LoginActivity.this, "获取验证码成功", Toast.LENGTH_SHORT).show();
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("phone", phone);
-                    editor.apply();
+                    MyApplication.getSp().putData("phone", phone);
                 }
 
                 @Override
@@ -207,7 +201,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Message message = Message.obtain();
         message.obj = currentSecond;
         message.what = 100;
-        handler.sendMessageDelayed(message, 1000);
+        handler.sendMessageDelayed(message, 0);
     }
 
 }

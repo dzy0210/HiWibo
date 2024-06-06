@@ -25,7 +25,7 @@ public interface ApiService {
     Call<BaseBean<String>> login(@Body LoginBean bean);
 
     @GET("/weibo/api/user/info")
-    @Headers({"Content-Type: application/json","Accept: application/json"})
+    @Headers({"Content-Type: application/json","Accept: application/json"})//需要添加头
     Call<BaseBean<UserInfo>> getUserInfo();
 
 }
