@@ -2,6 +2,7 @@ package com.example.weibo_duzhaoyang.adapters;
 
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -67,6 +68,7 @@ public class MultiItemAdapter extends RecyclerView.Adapter<MultiItemAdapter.View
         Glide.with(holder.itemView.getContext()).load(weiboInfo.getAvatar()).into(holder.ivItemIcon);
         Glide.with(holder.itemView.getContext()).load(R.drawable.delete).into(holder.ivItemDelete);
         if (weiboInfo.getVideoUrl() != null) {
+            SeekBar seekBar = ((VideoVH)holder).seekBar;
             MediaPlayer mediaPlayer = new MediaPlayer();
             try {
                 mediaPlayer.setDataSource(weiboInfo.getVideoUrl());
@@ -82,13 +84,22 @@ public class MultiItemAdapter extends RecyclerView.Adapter<MultiItemAdapter.View
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     Glide.with(ivPoster).load(weiboInfo.getPoster()).into(ivPoster);
-                    ivPoster.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            ivPoster.setVisibility(View.GONE);
-                            videoView.start();
-                        }
+                    ivPoster.setOnClickListener(v -> {
+                        ivPoster.setVisibility(View.GONE);
+                        videoView.start();
                     });
+                    int duration = mp.getDuration();
+                    seekBar.setMax(duration);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mp.isPlaying()) {
+                                int currentPosition = mp.getCurrentPosition();
+                                seekBar.setProgress(currentPosition);
+                            }
+                            new Handler().postDelayed(this, 1000);
+                        }
+                    }, 1000);
                 }
             });
 
