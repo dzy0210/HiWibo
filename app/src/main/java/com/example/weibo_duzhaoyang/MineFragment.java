@@ -72,6 +72,7 @@ public class MineFragment extends Fragment {
         if (logged) {
             tvOperate = toolbar.findViewById(R.id.toolbar_operation);
             tvOperate.setText("退出");
+            tvOperate.setVisibility(View.VISIBLE);
             tvOperate.setOnClickListener(v -> {
                 spu.putData("logged", false);
                 spu.putData("token", "");
