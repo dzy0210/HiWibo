@@ -30,7 +30,6 @@ public class HelloActivity extends AppCompatActivity {
             startActivity(new Intent(HelloActivity.this, MainActivity.class));
             finish();
         }
-
     }
 
     private void showPrivacyDialog(Context context) {

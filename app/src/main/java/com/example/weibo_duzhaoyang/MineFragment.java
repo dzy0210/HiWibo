@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ public class MineFragment extends Fragment {
     SharedPreferencesUtil spu = MyApplication.getSp();
     TextView tvOperate;
     private View view;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +49,6 @@ public class MineFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_mine, container, false);
         initView();
         initToolbar();
-
         return view;
     }
     void initView() {
