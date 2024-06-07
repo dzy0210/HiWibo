@@ -92,12 +92,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.tv_get_sms: {
                 tvGetSms.setEnabled(false);
                 countDown();
-//                getSms();
+                getSms();
                 break;
             }
             case R.id.tv_login:{
                 login();
-                getUserinfo();
+//                getUserinfo();
                 break;
             }
             case R.id.toolbar_back:
@@ -136,7 +136,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     spu.putData("token", token);
                     spu.putData("phone", phone);
                     Log.i(TAG, "onResponse:2 "+token);
-//                    getUserinfo();
+                    getUserinfo();
                 } else {
                     Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
                 }
@@ -156,6 +156,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         userInfo.enqueue(new Callback<BaseBean<UserInfo>>() {
             @Override
             public void onResponse(Call<BaseBean<UserInfo>> call, Response<BaseBean<UserInfo>> response) {
+                Log.i(TAG, "onResponse: 15656165"+ response.body().toString());
                 if(response.body().getCode() == 200) {
                     Log.i(TAG, "onResponse:4 "+response.body().getData());
                     UserInfo data = response.body().getData();

@@ -48,8 +48,5 @@ public class MainActivity extends AppCompatActivity {
             tab.setText(titles[position]);
             tab.setIcon(ContextCompat.getDrawable(this, icons[position]));
         }).attach();
-        for (int i = 0; i < tab.getTabCount(); i++) {
-            tab.getTabAt(i).setIcon(icons[i]);
-        }
     }
 }

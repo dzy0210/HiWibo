@@ -27,7 +27,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MineFragment extends Fragment {
-    ImageView ivAvtar;
+    ImageView ivAvatar;
     TextView tvUsername;
     TextView tvFansNum;
     MaterialToolbar toolbar;
@@ -51,10 +51,10 @@ public class MineFragment extends Fragment {
         return view;
     }
     void initView() {
-        ivAvtar = view.findViewById(R.id.iv_avatar);
+        ivAvatar = view.findViewById(R.id.iv_avatar);
         tvUsername = view.findViewById(R.id.tv_user_name);
         tvFansNum = view.findViewById(R.id.tv_fans_num);
-        ivAvtar.setOnClickListener(this::login);
+        ivAvatar.setOnClickListener(this::login);
         tvUsername.setOnClickListener(this::login);
         tvFansNum.setOnClickListener(this::login);
         tvOperate = view.findViewById(R.id.toolbar_operation);
@@ -66,6 +66,7 @@ public class MineFragment extends Fragment {
     }
 
     void initToolbar() {
+        logged = (Boolean) spu.getData("logged", false);
         toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle("我的");
         if (logged) {
@@ -73,6 +74,10 @@ public class MineFragment extends Fragment {
             tvOperate.setText("退出");
             tvOperate.setOnClickListener(v -> {
                 spu.putData("logged", false);
+                spu.putData("token", "");
+                spu.putData("avatar", "");
+                spu.putData("id", 0);
+                spu.putData("username", "");
                 startActivity(new Intent(getContext(), LoginActivity.class));
             });
         } else {
@@ -90,19 +95,19 @@ public class MineFragment extends Fragment {
     void loadData() {
         logged = (Boolean) spu.getData("logged", false);
         if (!logged) {
-            Glide.with(ivAvtar).load(R.drawable.null_avatar).apply(new RequestOptions().placeholder(R.drawable.null_avatar).circleCrop()).into(ivAvtar);
+            Glide.with(ivAvatar).load(R.drawable.null_avatar).apply(new RequestOptions().placeholder(R.drawable.null_avatar).circleCrop()).into(ivAvatar);
             tvUsername.setText("请先登录");
             tvFansNum.setText("点击头像去登陆");
-            ivAvtar.setEnabled(true);
+            ivAvatar.setEnabled(true);
             tvUsername.setEnabled(true);
             tvFansNum.setEnabled(true);
             tvOperate.setVisibility(View.INVISIBLE);
         } else {
-            ivAvtar.setEnabled(false);
+            ivAvatar.setEnabled(false);
             tvUsername.setEnabled(false);
             tvFansNum.setEnabled(false);
             tvUsername.setText((String) spu.getData("username", ""));
-            Glide.with(ivAvtar).load((String) spu.getData("avatar", "")).apply(new RequestOptions().placeholder(R.drawable.null_avatar).circleCrop()).into(ivAvtar);
+            Glide.with(ivAvatar).load((String) spu.getData("avatar", "")).apply(new RequestOptions().placeholder(R.drawable.null_avatar).circleCrop()).into(ivAvatar);
             tvFansNum.setText("粉丝数：9999");
         }
     }

@@ -9,4 +9,5 @@
     <color name="toolbar_blue">#0D84FF</color>
     <color name="sixty_black">#99000000</color>
     <color name="background_color">#F2F2F2</color>
+    <color name="bg_retry">#3482FF1A</color>
 </resources>

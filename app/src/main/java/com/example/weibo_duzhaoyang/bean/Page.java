@@ -1,14 +1,22 @@
 package com.example.weibo_duzhaoyang.bean;
 
 import java.util.List;
-public class GameInfoBean<T> {
+
+public class Page {
+    List<WeiboInfo> records;
     Integer total;
     Integer size;
     Integer current;
-    List<Object> orders;
-    Boolean searchCount;
     Integer pages;
-    List<T>records;
+
+
+    public List<WeiboInfo> getRecords() {
+        return records;
+    }
+
+    public void setRecords(List<WeiboInfo> records) {
+        this.records = records;
+    }
 
     public Integer getTotal() {
         return total;
@@ -34,22 +42,6 @@ public class GameInfoBean<T> {
         this.current = current;
     }
 
-    public List<Object> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<Object> orders) {
-        this.orders = orders;
-    }
-
-    public Boolean getSearchCount() {
-        return searchCount;
-    }
-
-    public void setSearchCount(Boolean searchCount) {
-        this.searchCount = searchCount;
-    }
-
     public Integer getPages() {
         return pages;
     }
@@ -58,24 +50,14 @@ public class GameInfoBean<T> {
         this.pages = pages;
     }
 
-    public List<T> getRecords() {
-        return records;
-    }
-
-    public void setRecords(List<T> records) {
-        this.records = records;
-    }
-
     @Override
     public String toString() {
-        return "GameInfoBean{" +
-                "total=" + total +
+        return "Page{" +
+                "records=" + records +
+                ", total=" + total +
                 ", size=" + size +
                 ", current=" + current +
-                ", orders=" + orders +
-                ", searchCount=" + searchCount +
-                ", page=" + pages +
-                ", records=" + records +
+                ", pages=" + pages +
                 '}';
     }
 }

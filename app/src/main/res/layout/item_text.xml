@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/item_style">
+    <include layout="@layout/item_person_info"/>
+    <TextView
+        android:id="@+id/tv_item_title"
+        style="@style/item_text"/>
+    <include layout="@layout/item_bottom_bar"/>
+</LinearLayout>

@@ -18,7 +18,10 @@ public class TokenHeaderInterceptor implements Interceptor {
     @Override
     public Response intercept(Interceptor.Chain chain) throws IOException {
             Request originalRequest = chain.request();
-            Request updateRequest = originalRequest.newBuilder().header("Authorization","Bearer "+ token).build();
+            Request updateRequest = originalRequest.newBuilder()
+                    .header("Authorization","Bearer "+ token)
+                    .header("content-type", "application/json")
+                    .build();
             return chain.proceed(updateRequest);
 //        }
     }
