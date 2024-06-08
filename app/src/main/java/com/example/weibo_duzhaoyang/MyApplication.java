@@ -12,22 +12,28 @@ public class MyApplication extends Application {
     public static SharedPreferencesUtil getSp() {
         return sharedPreferencesUtil;
     }
-    private HttpProxyCacheServer proxy;
+//    private HttpProxyCacheServer proxy;
 
-    public static HttpProxyCacheServer getProxy(Context context) {
-        MyApplication app = (MyApplication) context.getApplicationContext();
-        return app.proxy == null ? (app.proxy = app.newProxy()) : app.proxy;
-    }
-
-    private HttpProxyCacheServer newProxy() {
-        return new HttpProxyCacheServer.Builder(this)
-                .maxCacheSize(1024 * 1024 * 1024)
-                .build();
-    }
+//    public static HttpProxyCacheServer getProxy(Context context) {
+//        MyApplication app = (MyApplication) context.getApplicationContext();
+//        return app.proxy == null ? (app.proxy = app.newProxy()) : app.proxy;
+//    }
+//
+//    private HttpProxyCacheServer newProxy() {
+//        return new HttpProxyCacheServer.Builder(this)
+//                .maxCacheSize(1024 * 1024 * 1024)
+//                .build();
+//    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         sharedPreferencesUtil = SharedPreferencesUtil.getInstance(this);
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        sharedPreferencesUtil = null;
     }
 }

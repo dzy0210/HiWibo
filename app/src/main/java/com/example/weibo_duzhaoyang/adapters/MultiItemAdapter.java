@@ -1,7 +1,5 @@
 package com.example.weibo_duzhaoyang.adapters;
 
-import static com.example.weibo_duzhaoyang.MyApplication.getProxy;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
@@ -111,8 +109,7 @@ public class MultiItemAdapter extends RecyclerView.Adapter<MultiItemAdapter.View
 
             Glide.with(ivPoster).load(weiboInfo.getPoster()).into(ivPoster);
             ExoPlayer exoPlayer = new ExoPlayer
-                    .Builder(holder.itemView.getContext())
-                    .setMediaSourceFactory(new DefaultMediaSourceFactory(holder.itemView.getContext()))
+                    .Builder(holder.itemView.getContext().getApplicationContext())
                     .build();
 //            HttpProxyCacheServer proxy = getProxy(holder.itemView.getContext());
             //注意应采用来自代理的 url 而不是原始 url 来添加缓存

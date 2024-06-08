@@ -46,4 +46,9 @@ public class MainActivity extends AppCompatActivity {
             tab.setIcon(ContextCompat.getDrawable(this, icons[position]));
         }).attach();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

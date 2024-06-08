@@ -50,7 +50,7 @@ public class RecommendFragment extends Fragment {
     SharedPreferencesUtil spu;
     List<WeiboInfo> list;
     MultiItemAdapter adapter;
-    static int current = 1;
+    static int current;
     SwipeRefreshLayout srl;
     TextView tvRetry;
     ConstraintLayout clFail;
@@ -62,6 +62,7 @@ public class RecommendFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate: 44444");
     }
 
     @Override
@@ -69,18 +70,21 @@ public class RecommendFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view =  inflater.inflate(R.layout.fragment_recommend, container, false);
+        current = 1;
         initView();
         initToolbar();
         initRecyclerView();
         clLoading.setVisibility(View.VISIBLE);
         clFail.setVisibility(View.GONE);
         srl.setVisibility(View.GONE);
+        Log.i(TAG, "onCreateView: 33333");
         search();
         return view;
     }
 
     private void search() {
         Log.i(TAG, "search: "+token);
+        Log.i(TAG, "search: "+current);
         Call<BaseBean<Page>> call = RetrofitManager.getInstance(token).createApi().getWeiboList(current, 10);
         call.enqueue(new Callback<BaseBean<Page>>() {
             @Override
@@ -326,7 +330,9 @@ public class RecommendFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.i(TAG, "onResume: "+11111);
         token = (String) spu.getData("token", "");
         logged = (Boolean) spu.getData("logged", false);
     }
+
 }
