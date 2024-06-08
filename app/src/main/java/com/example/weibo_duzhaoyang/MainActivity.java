@@ -1,15 +1,13 @@
 package com.example.weibo_duzhaoyang;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
-import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
+import com.example.weibo_duzhaoyang.adapters.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 

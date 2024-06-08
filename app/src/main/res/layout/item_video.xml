@@ -9,24 +9,16 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <VideoView
-            android:id="@+id/video_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-        <ImageView
-            android:id="@+id/iv_video_play"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center_horizontal|bottom"/>
-        <SeekBar
-            android:id="@+id/seek_bar"
+        <androidx.media3.ui.PlayerView
+            android:id="@+id/player_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"/>
+            app:resize_mode="fixed_width"
+            />
         <ImageView
             android:id="@+id/iv_poster"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"/>
     </FrameLayout>
     <include layout="@layout/item_bottom_bar"/>
 </LinearLayout>

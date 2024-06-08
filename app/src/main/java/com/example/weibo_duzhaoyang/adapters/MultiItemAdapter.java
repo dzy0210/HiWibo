@@ -1,8 +1,15 @@
 package com.example.weibo_duzhaoyang.adapters;
 
+import static com.example.weibo_duzhaoyang.MyApplication.getProxy;
+
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -12,17 +19,32 @@ import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.Player;
+import androidx.media3.exoplayer.DefaultRenderersFactory;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
+import androidx.media3.exoplayer.source.MediaSource;
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import androidx.media3.ui.PlayerView;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.danikula.videocache.HttpProxyCacheServer;
+import com.example.weibo_duzhaoyang.ImageActivity;
 import com.example.weibo_duzhaoyang.R;
 import com.example.weibo_duzhaoyang.bean.WeiboInfo;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import kotlin.Unit;
@@ -31,11 +53,18 @@ import me.simple.view.ImageAdapter;
 import me.simple.view.NineGridView;
 
 public class MultiItemAdapter extends RecyclerView.Adapter<MultiItemAdapter.ViewHolder> {
+    private final String TAG = "dzy   MultiItemAdapter";
     private static final int VIDEO_TYPE = 0;
     private static final int SINGLE_IMAGE_TYPE = 1;
     private static final int MULTI_IMAGE_TYPE = 2;
     private static final int TEXT_TYPE = 3;
-
+    OnItemClickListener onItemClickListener;
+    public interface OnItemClickListener{
+        void onItemClick(View view, int position);
+    }
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
     List<WeiboInfo> list;
     public MultiItemAdapter(List<WeiboInfo> list) {
         this.list = list;
@@ -62,74 +91,90 @@ public class MultiItemAdapter extends RecyclerView.Adapter<MultiItemAdapter.View
         holder.tvItemTitle.setMaxLines(6);
         holder.tvItemUsername.setText(weiboInfo.getUsername());
         holder.tvComment.setText("评论");
-        holder.tvLike.setText("点赞");
-        Glide.with(holder.itemView.getContext()).load(R.drawable.like).into(holder.ivLike);
-        Glide.with(holder.itemView.getContext()).load(R.drawable.comment).into(holder.ivComment);
-        Glide.with(holder.itemView.getContext()).load(weiboInfo.getAvatar()).into(holder.ivItemIcon);
-        Glide.with(holder.itemView.getContext()).load(R.drawable.delete).into(holder.ivItemDelete);
-        if (weiboInfo.getVideoUrl() != null) {
-            SeekBar seekBar = ((VideoVH)holder).seekBar;
-            MediaPlayer mediaPlayer = new MediaPlayer();
-            try {
-                mediaPlayer.setDataSource(weiboInfo.getVideoUrl());
-                mediaPlayer.prepare();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            mediaPlayer.setOnPreparedListener(mp -> mp.pause());
-            VideoView videoView = ((VideoVH)holder).videoView;
-            ImageView ivPoster = ((VideoVH)holder).ivPoster;
-            videoView.setVideoURI(Uri.parse(weiboInfo.getVideoUrl()));
-            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    Glide.with(ivPoster).load(weiboInfo.getPoster()).into(ivPoster);
-                    ivPoster.setOnClickListener(v -> {
-                        ivPoster.setVisibility(View.GONE);
-                        videoView.start();
-                    });
-                    int duration = mp.getDuration();
-                    seekBar.setMax(duration);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (mp.isPlaying()) {
-                                int currentPosition = mp.getCurrentPosition();
-                                seekBar.setProgress(currentPosition);
-                            }
-                            new Handler().postDelayed(this, 1000);
-                        }
-                    }, 1000);
-                }
-            });
+        holder.tvLike.setText(weiboInfo.getLikeFlag()?String.valueOf(weiboInfo.getLikeCount()):"点赞");
+        holder.tvLike.setTextColor(weiboInfo.getLikeFlag()?Color.parseColor("#EA512F"):Color.parseColor("#B2000000"));
+        if (onItemClickListener != null) {
+            holder.clComment.setOnClickListener(v -> onItemClickListener.onItemClick(v, position));
+            holder.clLike.setOnClickListener(v -> onItemClickListener.onItemClick(v, position));
+            holder.ivItemDelete.setOnClickListener(v -> onItemClickListener.onItemClick(v, position));
+        }
 
-            videoView.setOnClickListener(v -> {
-                if (videoView.isPlaying()) {
-                    videoView.pause();
-                } else {
-                    videoView.start();
+        Glide.with(holder.itemView.getContext()).load(weiboInfo.getLikeFlag()?R.drawable.liked:R.drawable.like).into(holder.ivLike);
+        Glide.with(holder.itemView.getContext()).load(R.drawable.comment).into(holder.ivComment);
+        Glide.with(holder.itemView.getContext()).load(weiboInfo.getAvatar()).apply(new RequestOptions().circleCrop()).into(holder.ivItemIcon);
+        Glide.with(holder.itemView.getContext()).load(R.drawable.delete).into(holder.ivItemDelete);
+
+        //视频item
+        if (weiboInfo.getVideoUrl() != null) {
+            PlayerView playerView = ((VideoVH)holder).playerView;
+            ImageView ivPoster = ((VideoVH)holder).ivPoster;
+
+            Glide.with(ivPoster).load(weiboInfo.getPoster()).into(ivPoster);
+            ExoPlayer exoPlayer = new ExoPlayer
+                    .Builder(holder.itemView.getContext())
+                    .setMediaSourceFactory(new DefaultMediaSourceFactory(holder.itemView.getContext()))
+                    .build();
+            HttpProxyCacheServer proxy = getProxy(holder.itemView.getContext());
+            //注意应采用来自代理的 url 而不是原始 url 来添加缓存
+            String proxyUrl = proxy.getProxyUrl(weiboInfo.getVideoUrl());
+
+            exoPlayer.addListener(new Player.Listener() {
+                @Override
+                public void onIsPlayingChanged(boolean isPlaying) {
+                    if (isPlaying) {
+                        ivPoster.setVisibility(View.GONE);
+                    }
                 }
             });
-            videoView.setOnCompletionListener(mp -> {
-                videoView.seekTo(0);
-                videoView.start();
-            });
+            playerView.setPlayer(exoPlayer);
+            exoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
+            exoPlayer.setMediaItem(MediaItem.fromUri(proxyUrl));
+            exoPlayer.setPlayWhenReady(false);
+            exoPlayer.prepare();
+            ivPoster.setOnClickListener(v -> exoPlayer.play());
 
             return;
         }
+
+        //单图片item
         if (weiboInfo.getImages() != null && weiboInfo.getImages().size() == 1) {
             Glide.with(holder.itemView.getContext()).load(weiboInfo.getImages().get(0)).into(((SingleImageVH)holder).ivSingleImage);
+            if (onItemClickListener != null) {
+                ImageView ivSingleImage = ((SingleImageVH)holder).ivSingleImage;
+                ivSingleImage.setOnClickListener(v->{
+                    onItemClickListener.onItemClick(v, position);
+                });
+            }
             return;
         }
-        if (weiboInfo.getImages() != null && weiboInfo.getImages().size() > 1) {
 
-            NineGridView ngv = ((MultiImageVH) holder).ngv;
-            ImageAdapter<String> adapter = new ImageAdapter<>(weiboInfo.getImages(), (imageView, s, integer) -> {
-                Glide.with(imageView).load(s).into(imageView);
-                return null;
+        //多图片item
+        if (weiboInfo.getImages() != null && weiboInfo.getImages().size() > 1) {
+            RecyclerView rvMultiImage = ((MultiImageVH)holder).rvMultiImage;
+
+            rvMultiImage.setOnClickListener(v -> Toast.makeText(rvMultiImage.getContext(), "recycleview", Toast.LENGTH_SHORT).show());
+
+            MultiImageRecyclerAdapter adapter = new MultiImageRecyclerAdapter(weiboInfo.getImages());
+            adapter.setOnMultiImageItemClickListener((view, position1) -> {
+                Intent intent = new Intent(holder.itemView.getContext(), ImageActivity.class);
+                intent.putExtra("position", position1);
+                Bundle bundle = new Bundle();
+                bundle.putStringArrayList("images", (ArrayList<String>) weiboInfo.getImages());
+                intent.putExtra("imgBundle", bundle);
+                holder.itemView.getContext().startActivity(intent);
             });
-            ngv.setAdapter(adapter);
-            return;
+            rvMultiImage.setLayoutManager(new GridLayoutManager(rvMultiImage.getContext(), 3));
+            rvMultiImage.setAdapter(adapter);
+        }
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        if (holder instanceof VideoVH) {
+            if (((VideoVH) holder).playerView.getPlayer().isPlaying()) {
+                ((VideoVH) holder).playerView.getPlayer().pause();
+            }
         }
     }
 
@@ -166,22 +211,19 @@ public class MultiItemAdapter extends RecyclerView.Adapter<MultiItemAdapter.View
     }
 
     static class MultiImageVH extends ViewHolder {
-        NineGridView ngv;
+        RecyclerView rvMultiImage;
         public MultiImageVH(@NonNull View itemView) {
             super(itemView);
-            ngv = itemView.findViewById(R.id.ngv);
+            rvMultiImage = itemView.findViewById(R.id.rv_multi_image);
         }
     }
     static class VideoVH extends ViewHolder{
-        VideoView videoView;
-        ImageView ivVideoPlay;
+        PlayerView playerView;
         SeekBar seekBar;
         ImageView ivPoster;
         public VideoVH(@NonNull View itemView) {
             super(itemView);
-            videoView = itemView.findViewById(R.id.video_view);
-            ivVideoPlay = itemView.findViewById(R.id.iv_video_play);
-            seekBar = itemView.findViewById(R.id.seek_bar);
+            playerView = itemView.findViewById(R.id.player_view);
             ivPoster = itemView.findViewById(R.id.iv_poster);
         }
     }
@@ -194,6 +236,8 @@ public class MultiItemAdapter extends RecyclerView.Adapter<MultiItemAdapter.View
         ImageView ivComment;
         TextView tvLike;
         TextView tvComment;
+        ConstraintLayout clLike;
+        ConstraintLayout clComment;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivItemIcon = itemView.findViewById(R.id.iv_item_icon);
@@ -204,6 +248,8 @@ public class MultiItemAdapter extends RecyclerView.Adapter<MultiItemAdapter.View
             tvLike = itemView.findViewById(R.id.tv_like);
             ivComment = itemView.findViewById(R.id.iv_comment);
             ivLike = itemView.findViewById(R.id.iv_like);
+            clLike = itemView.findViewById(R.id.cl_like);
+            clComment = itemView.findViewById(R.id.cl_comment);
         }
     }
 }

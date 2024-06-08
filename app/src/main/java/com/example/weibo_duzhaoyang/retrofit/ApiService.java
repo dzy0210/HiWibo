@@ -1,6 +1,7 @@
 package com.example.weibo_duzhaoyang.retrofit;
 
 import com.example.weibo_duzhaoyang.bean.BaseBean;
+import com.example.weibo_duzhaoyang.bean.IdBean;
 import com.example.weibo_duzhaoyang.bean.LoginBean;
 import com.example.weibo_duzhaoyang.bean.Page;
 import com.example.weibo_duzhaoyang.bean.UserInfo;
@@ -30,4 +31,9 @@ public interface ApiService {
 
     @GET("/weibo/homePage")
     Call<BaseBean<Page>> getWeiboList(@Query("current") Integer current, @Query("size") Integer size);
+
+    @POST("/weibo/like/up")
+    Call<BaseBean<Boolean>>like(@Body IdBean idBean);
+    @POST("/weibo/like/down")
+    Call<BaseBean<Boolean>>dislike(@Body IdBean idBean);
 }

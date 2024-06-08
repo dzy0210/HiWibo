@@ -151,12 +151,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
     void getUserinfo() {
         String token = (String) MyApplication.getSp().getData("token", "");
-        Log.i(TAG, "getUserinfo:3 "+token);
         Call<BaseBean<UserInfo>> userInfo = RetrofitManager.getInstance(token).createApi().getUserInfo();
         userInfo.enqueue(new Callback<BaseBean<UserInfo>>() {
             @Override
             public void onResponse(Call<BaseBean<UserInfo>> call, Response<BaseBean<UserInfo>> response) {
-                Log.i(TAG, "onResponse: 15656165"+ response.body().toString());
                 if(response.body().getCode() == 200) {
                     Log.i(TAG, "onResponse:4 "+response.body().getData());
                     UserInfo data = response.body().getData();
@@ -165,7 +163,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     spu.putData("id", data.getId());
                     spu.putData("logged", true);
                     finish();
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+//                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 }
             }
 
