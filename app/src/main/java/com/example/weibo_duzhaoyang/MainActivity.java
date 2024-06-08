@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
         tab = findViewById(R.id.tab);
         String[] titles = new String[]{"推荐", "我的"};
         int[] icons = new int[] {R.drawable.recommend_icon, R.drawable.mine_icon};
-
         fragments = new ArrayList<>();
         MineFragment mineFragment = new MineFragment();
         RecommendFragment recommendFragment = new RecommendFragment();

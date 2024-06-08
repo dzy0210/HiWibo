@@ -98,6 +98,7 @@ public class RecommendFragment extends Fragment {
                     List<WeiboInfo> data = response.body().getData().getRecords();
                     if (data.isEmpty()) {
                         Toast.makeText(getContext(), "没有更多内容了", Toast.LENGTH_SHORT).show();
+                        return;
                     }
                     if (current == 1) {
                         list.clear();
@@ -187,7 +188,7 @@ public class RecommendFragment extends Fragment {
                 LinearLayoutManager layoutManager = (LinearLayoutManager)recyclerView.getLayoutManager();
                 int itemCount = layoutManager.getItemCount();
                 int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
-                if (lastVisibleItemPosition + 3 > itemCount) {
+                if (lastVisibleItemPosition + 2 >= itemCount) {
                     search();
                 }
             }
